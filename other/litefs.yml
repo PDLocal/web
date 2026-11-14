@@ -19,14 +19,16 @@ proxy:
 #
 # These environment variables will be available in your Fly.io application.
 lease:
-  type: 'consul'
-  candidate: ${FLY_REGION == PRIMARY_REGION}
-  promote: true
-  advertise-url: 'http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202'
-
-  consul:
-    url: '${FLY_CONSUL_URL}'
-    key: 'epic-stack-litefs_20250222/${FLY_APP_NAME}'
+  #  type: 'consul'
+  #  candidate: ${FLY_REGION == PRIMARY_REGION}
+  #  promote: true
+  #  advertise-url: 'http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202'
+  #
+  #  consul:
+  #    url: '${FLY_CONSUL_URL}'
+  #    key: 'epic-stack-litefs_20250222/${FLY_APP_NAME}'
+  type: 'static'
+  candidate: true
 
 exec:
   - cmd: npx prisma migrate deploy

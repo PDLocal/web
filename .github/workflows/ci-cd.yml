@@ -1,13 +1,14 @@
-name: 🚀 Deploy
+name: 🚀 CI & CD
+
 on:
   push:
-    branches:
-      - main
-      - dev
-  pull_request: {}
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize, closed]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -15,6 +16,24 @@ permissions:
   contents: read
 
 jobs:
+  format:
+    name: 🎨 Prettier
+    runs-on: ubuntu-22.04
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 📥 Download deps
+        uses: bahmutov/npm-install@v1
+
+      - name: 🎨 Check formatting
+        run: npm run format:check
+
   lint:
     name: ⬣ ESLint
     runs-on: ubuntu-22.04
@@ -146,8 +165,10 @@ jobs:
   container:
     name: 📦 Prepare Container
     runs-on: ubuntu-24.04
-    # only prepare container on pushes
-    if: ${{ github.event_name == 'push' }}
+    # only run if pushing to main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # only run if CI checks pass
+    needs: [format, lint, typecheck, vitest, playwright]
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -164,20 +185,7 @@ jobs:
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
-      - name: 📦 Build Staging Container
-        if: ${{ github.ref == 'refs/heads/dev' }}
-        run: |
-          flyctl deploy \
-            --build-only \
-            --push \
-            --image-label ${{ github.sha }} \
-            --build-arg COMMIT_SHA=${{ github.sha }} \
-            --app ${{ steps.app_name.outputs.value }}-staging
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
       - name: 📦 Build Production Container
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           flyctl deploy \
             --build-only \
@@ -192,9 +200,10 @@ jobs:
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-24.04
-    needs: [lint, typecheck, vitest, playwright, container]
-    # only deploy on pushes
-    if: ${{ github.event_name == 'push' }}
+    # only run if pushing to main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # only run if container passes
+    needs: container
     steps:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
@@ -211,19 +220,66 @@ jobs:
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@1.5
 
-      - name: 🚀 Deploy Staging
-        if: ${{ github.ref == 'refs/heads/dev' }}
-        run: |
-          flyctl deploy \
-            --image "registry.fly.io/${{ steps.app_name.outputs.value }}-staging:${{ github.sha }}" \
-            --app ${{ steps.app_name.outputs.value }}-staging
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
       - name: 🚀 Deploy Production
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           flyctl deploy \
             --image "registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.sha }}"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  review-app:
+    runs-on: ubuntu-latest
+    # Only run on PRs targeting 'main' that are NOT being closed
+    if: github.base_ref == 'main' && github.event.action != 'closed'
+    # Only run if CI checks pass
+    needs: [format, lint, typecheck, vitest]
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_REGION: sjc
+      FLY_ORG: pd-local
+
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+
+    # Deploying apps with this "review" environment allows the URL for the app to be displayed in the PR UI.
+    # Feel free to change the name of this environment.
+    environment:
+      name: review
+      # The script in the `deploy` sets the URL output for each review app.
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Deploy PR app to Fly.io
+        id: deploy
+        uses: superfly/fly-pr-review-apps@1.5.0
+        with:
+          name: pr-${{ github.event.number }}-pdlocal
+          org: pd-local
+          region: sjc
+          secrets: >
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }} HONEYPOT_SECRET=${{
+            secrets.HONEYPOT_SECRET }} AWS_ACCESS_KEY_ID=${{
+            secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{
+            secrets.AWS_SECRET_ACCESS_KEY }} AWS_REGION=${{ secrets.AWS_REGION
+            }} AWS_ENDPOINT_URL_S3=${{ secrets.AWS_ENDPOINT_URL_S3 }}
+            BUCKET_NAME=${{ secrets.BUCKET_NAME }}
+            DATABASE_URL=file:/data/sqlite.db?connection_limit=1
+            INTERNAL_COMMAND_TOKEN=${{ secrets.INTERNAL_COMMAND_TOKEN }}
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+            RESEND_AUDIENCE_ID=${{ secrets.RESEND_AUDIENCE_ID }}
+
+  destroy-review-app:
+    name: 🗑 Destroy Review App
+    runs-on: ubuntu-latest
+    # This job only runs when a PR is closed (merged or manually closed)
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+
+    steps:
+      - name: 🗑 Destroy App
+        uses: superfly/fly-pr-review-apps@1.5.0
+        with:
+          name: pr-${{ github.event.number }}-pdlocal
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

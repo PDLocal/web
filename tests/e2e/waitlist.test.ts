@@ -29,9 +29,7 @@ test('joins the waitlist from the homepage', async ({
 	await page
 		.getByRole('textbox', { name: /first name/i })
 		.fill(waitlistData.firstName)
-	await page
-		.getByRole('textbox', { name: /email/i })
-		.fill(waitlistData.email)
+	await page.getByRole('textbox', { name: /email/i }).fill(waitlistData.email)
 
 	await page.getByRole('button', { name: /join|sign up|submit/i }).click()
 

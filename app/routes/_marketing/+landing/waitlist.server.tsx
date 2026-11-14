@@ -69,8 +69,8 @@ function WaitlistWelcomeEmail({ firstName }: { firstName: string }) {
 				<p>
 					<E.Text>
 						You're on the PD Local waitlist. We're building a free place for
-						people living with Parkinson's — and the people who care for them
-						— to find real information, support, and each other.
+						people living with Parkinson's — and the people who care for them —
+						to find real information, support, and each other.
 					</E.Text>
 				</p>
 				<p>
