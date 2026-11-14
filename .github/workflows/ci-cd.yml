@@ -267,8 +267,8 @@ jobs:
             BUCKET_NAME=${{ secrets.BUCKET_NAME }}
             DATABASE_URL=file:/data/sqlite.db?connection_limit=1
             INTERNAL_COMMAND_TOKEN=${{ secrets.INTERNAL_COMMAND_TOKEN }}
-            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
-            RESEND_AUDIENCE_ID=${{ secrets.RESEND_AUDIENCE_ID }}
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }} RESEND_AUDIENCE_ID=${{
+            secrets.RESEND_AUDIENCE_ID }}
 
   destroy-review-app:
     name: 🗑 Destroy Review App
