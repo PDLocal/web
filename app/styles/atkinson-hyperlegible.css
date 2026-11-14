@@ -1,0 +1,42 @@
+/**
+ * Atkinson Hyperlegible — self-hosted for privacy (no third-party font
+ * requests) and chosen for low-vision legibility (designed by the Braille
+ * Institute). Files downloaded from Google Fonts' CDN, latin subset only.
+ * See docs/fonts.md for the self-hosting convention this follows.
+ */
+
+@font-face {
+	font-family: 'Atkinson Hyperlegible';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/atkinson-hyperlegible/atkinson-hyperlegible-400.woff2')
+		format('woff2');
+}
+
+@font-face {
+	font-family: 'Atkinson Hyperlegible';
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url('/fonts/atkinson-hyperlegible/atkinson-hyperlegible-700.woff2')
+		format('woff2');
+}
+
+@font-face {
+	font-family: 'Atkinson Hyperlegible';
+	font-style: italic;
+	font-weight: 400;
+	font-display: swap;
+	src: url('/fonts/atkinson-hyperlegible/atkinson-hyperlegible-italic-400.woff2')
+		format('woff2');
+}
+
+@font-face {
+	font-family: 'Atkinson Hyperlegible';
+	font-style: italic;
+	font-weight: 700;
+	font-display: swap;
+	src: url('/fonts/atkinson-hyperlegible/atkinson-hyperlegible-italic-700.woff2')
+		format('woff2');
+}

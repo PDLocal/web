@@ -155,6 +155,15 @@ if (!ALLOW_INDEXING) {
 	})
 }
 
+// Self-hosted fonts (e.g. Atkinson Hyperlegible) rarely change, so they can
+// be cached aggressively. Registered before the dev/prod branches below so
+// font requests are served here rather than falling through to the SSR
+// handler's 404.
+app.use(
+	'/fonts',
+	express.static('public/fonts', { immutable: true, maxAge: '1y' }),
+)
+
 if (IS_DEV) {
 	console.log('Starting development server')
 	const viteDevServer = await import('vite').then((vite) =>

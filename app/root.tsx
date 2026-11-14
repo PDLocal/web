@@ -27,6 +27,7 @@ import {
 	useOptionalTheme,
 	useTheme,
 } from './routes/resources/theme-switch.tsx'
+import fontStyleSheetUrl from './styles/atkinson-hyperlegible.css?url'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
@@ -57,14 +58,19 @@ export const links: Route.LinksFunction = () => {
 			href: '/site.webmanifest',
 			crossOrigin: 'use-credentials',
 		} as const, // necessary to make typescript happy
+		{ rel: 'preload', href: fontStyleSheetUrl, as: 'style' },
+		{ rel: 'stylesheet', href: fontStyleSheetUrl },
 		{ rel: 'stylesheet', href: tailwindStyleSheetUrl },
 	].filter(Boolean)
 }
 
 export const meta: Route.MetaFunction = ({ data }) => {
 	return [
-		{ title: data ? 'Epic Notes' : 'Error | Epic Notes' },
-		{ name: 'description', content: `Your own captain's log` },
+		{ title: data ? 'PD Local' : 'Error | PD Local' },
+		{
+			name: 'description',
+			content: `Free support and community for people with Parkinson's and their caregivers.`,
+		},
 	]
 }
 
@@ -238,10 +244,10 @@ function Logo() {
 	return (
 		<Link to="/" className="group grid leading-snug">
 			<span className="font-light transition group-hover:-translate-x-1">
-				epic
+				PD
 			</span>
 			<span className="font-bold transition group-hover:translate-x-1">
-				notes
+				Local
 			</span>
 		</Link>
 	)

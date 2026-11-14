@@ -19,4 +19,18 @@ export const handlers: Array<HttpHandler> = [
 			created_at: new Date().toISOString(),
 		})
 	}),
+
+	http.post(
+		`https://api.resend.com/audiences/:audienceId/contacts`,
+		async ({ request }) => {
+			requireHeader(request.headers, 'Authorization')
+			const body = await request.json()
+			console.info('🔶 mocked resend contact upsert:', body)
+
+			return json({
+				object: 'contact',
+				id: faker.string.uuid(),
+			})
+		},
+	),
 ]

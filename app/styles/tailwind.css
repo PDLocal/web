@@ -15,17 +15,20 @@
 	--popover: oklch(100% 0 0);
 	--popover-foreground: oklch(13.71% 0.036 258.53);
 
-	--primary: oklch(20.79% 0.0399 265.73);
-	--primary-foreground: oklch(98.38% 0.0035 247.86);
+	/* Deep teal (brand primary) */
+	--primary: oklch(42% 0.09 195);
+	--primary-foreground: oklch(98% 0.01 195);
 
-	--secondary: oklch(86.48% 0.0153 248);
-	--secondary-foreground: oklch(20.79% 0.0399 265.73);
+	/* Warm sand (brand secondary) */
+	--secondary: oklch(88% 0.06 70);
+	--secondary-foreground: oklch(22% 0.03 70);
 
 	--muted: oklch(94.32% 0.0123 247.96);
 	--muted-foreground: oklch(40.68% 0.0281 257.44);
 
-	--accent: oklch(91.87% 0.01770618193703561 248.02064625050508);
-	--accent-foreground: oklch(20.79% 0.0399 265.73);
+	/* Soft coral (brand accent — used sparingly, e.g. waitlist CTA hover) */
+	--accent: oklch(72% 0.13 35);
+	--accent-foreground: oklch(15% 0.02 35);
 
 	--border: oklch(92.9% 0.0126 255.53);
 	--input: oklch(92.56% 0.0133 255.54);
@@ -49,17 +52,20 @@
 	--popover: oklch(13.71% 0.036 258.53);
 	--popover-foreground: oklch(98.38% 0.0035 247.86);
 
-	--primary: oklch(98.38% 0.0035 247.86);
-	--primary-foreground: oklch(20.79% 0.0399 265.73);
+	/* Deep teal (brand primary) — lightened for dark mode */
+	--primary: oklch(80% 0.09 195);
+	--primary-foreground: oklch(15% 0.02 195);
 
-	--secondary: oklch(34.74% 0.0295 260.13);
-	--secondary-foreground: oklch(98.38% 0.0035 247.86);
+	/* Warm sand (brand secondary) — darkened for dark mode */
+	--secondary: oklch(32% 0.05 70);
+	--secondary-foreground: oklch(95% 0.02 70);
 
 	--muted: oklch(22.6% 0.0267 260.02);
 	--muted-foreground: oklch(71.07% 0.0351 256.79);
 
-	--accent: oklch(20.56% 0.022816 260.0464);
-	--accent-foreground: oklch(98.38% 0.0035 247.86);
+	/* Soft coral (brand accent) — darkened for dark mode, still usable contrast */
+	--accent: oklch(38% 0.12 35);
+	--accent-foreground: oklch(97% 0.01 35);
 
 	--border: oklch(28% 0.0369 259.97);
 	--input: oklch(28% 0.0369 259.97);
@@ -102,6 +108,8 @@
 }
 
 @theme {
+	--font-sans: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
+
 	--text-mega: 5rem;
 	--text-mega--line-height: 5.25rem;
 	--text-mega--font-weight: 700;

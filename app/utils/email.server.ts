@@ -31,7 +31,8 @@ export async function sendEmail({
 	| { html: string; text: string; react?: never }
 	| { react: ReactElement; html?: never; text?: never }
 )) {
-	const from = 'hello@epicstack.dev'
+	// TODO: must match a Resend-verified sending domain before real sends work
+	const from = 'hello@pdlocal.org'
 
 	const email = {
 		from,
@@ -60,6 +61,77 @@ export async function sendEmail({
 			'Content-Type': 'application/json',
 		},
 	})
+	const data = await response.json()
+	const parsedData = resendSuccessSchema.safeParse(data)
+
+	if (response.ok && parsedData.success) {
+		return {
+			status: 'success',
+			data: parsedData,
+		} as const
+	} else {
+		const parseResult = resendErrorSchema.safeParse(data)
+		if (parseResult.success) {
+			return {
+				status: 'error',
+				error: parseResult.data,
+			} as const
+		} else {
+			return {
+				status: 'error',
+				error: {
+					name: 'UnknownError',
+					message: 'Unknown Error',
+					statusCode: 500,
+					cause: data,
+				} satisfies ResendError,
+			} as const
+		}
+	}
+}
+
+export async function upsertResendContact({
+	email,
+	firstName,
+	lastName,
+}: {
+	email: string
+	firstName: string
+	lastName?: string | null
+}) {
+	const audienceId = process.env.RESEND_AUDIENCE_ID
+
+	// feel free to remove this condition once you've set up a Resend audience
+	if ((!process.env.RESEND_API_KEY || !audienceId) && !process.env.MOCKS) {
+		console.error(
+			`RESEND_API_KEY or RESEND_AUDIENCE_ID not set and we're not in mocks mode.`,
+		)
+		console.error(
+			`Would have upserted this Resend contact:`,
+			JSON.stringify({ email, firstName, lastName }),
+		)
+		return {
+			status: 'success',
+			data: { id: 'mocked' },
+		} as const
+	}
+
+	const response = await fetch(
+		`https://api.resend.com/audiences/${audienceId}/contacts`,
+		{
+			method: 'POST',
+			body: JSON.stringify({
+				email,
+				first_name: firstName,
+				last_name: lastName,
+				unsubscribed: false,
+			}),
+			headers: {
+				Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+				'Content-Type': 'application/json',
+			},
+		},
+	)
 	const data = await response.json()
 	const parsedData = resendSuccessSchema.safeParse(data)
 

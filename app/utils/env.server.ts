@@ -12,6 +12,10 @@ const schema = z.object({
 	SENTRY_DSN: z.string().optional(),
 	// If you plan to use Resend, remove the .optional()
 	RESEND_API_KEY: z.string().optional(),
+	// Resend Audience ID for the waitlist/contact list. Optional until a real
+	// Resend account + audience is configured; contact-sync safely no-ops
+	// without it (see upsertResendContact in email.server.ts).
+	RESEND_AUDIENCE_ID: z.string().optional(),
 	// If you plan to use GitHub auth, remove the .optional()
 	GITHUB_CLIENT_ID: z.string().optional(),
 	GITHUB_CLIENT_SECRET: z.string().optional(),
