@@ -1,4 +1,4 @@
-app = "web-bedd"
+app = "pdlocal"
 primary_region = "sjc"
 kill_signal = "SIGINT"
 kill_timeout = 5
