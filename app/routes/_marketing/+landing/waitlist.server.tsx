@@ -1,22 +1,11 @@
 import { parseWithZod } from '@conform-to/zod'
 import * as E from '@react-email/components'
 import { data, type ActionFunctionArgs } from 'react-router'
-import { z } from 'zod'
 import { prisma } from '#app/utils/db.server.ts'
 import { sendEmail, upsertResendContact } from '#app/utils/email.server.ts'
 import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { createToastHeaders } from '#app/utils/toast.server.ts'
-import { EmailSchema } from '#app/utils/user-validation.ts'
-
-export const ContactSchema = z.object({
-	firstName: z
-		.string({ required_error: 'First name is required' })
-		.trim()
-		.min(1, 'First name is required')
-		.max(50, 'First name is too long'),
-	lastName: z.string().trim().max(50, 'Last name is too long').optional(),
-	email: EmailSchema,
-})
+import { ContactSchema } from './waitlist-schema.ts'
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()

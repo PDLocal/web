@@ -7,7 +7,7 @@ import { ErrorList, Field } from '#app/components/forms.tsx'
 import { buttonVariants } from '#app/components/ui/button.tsx'
 import { StatusButton } from '#app/components/ui/status-button.tsx'
 import { useIsPending } from '#app/utils/misc.tsx'
-import { ContactSchema } from './+landing/waitlist.server.tsx'
+import { ContactSchema } from './+landing/waitlist-schema.ts'
 import { type Route } from './+types/index.ts'
 
 export { action } from './+landing/waitlist.server.tsx'
