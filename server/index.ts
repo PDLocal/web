@@ -42,13 +42,20 @@ app.use((req, res, next) => {
 })
 
 // pdlocal.com and pdlocal.net point here too (DNS-only, no Hover
-// forwarding), so any host other than the canonical org domain gets
-// permanently redirected here instead.
-const CANONICAL_HOSTS = new Set(['pdlocal.org', 'www.pdlocal.org'])
+// forwarding), so those specific alternate domains get permanently
+// redirected to the canonical org domain. This is an allowlist (not
+// "anything that isn't pdlocal.org") so it never touches localhost,
+// *.fly.dev review apps, or any other host the app is reached by.
+const ALTERNATE_HOSTS = new Set([
+	'pdlocal.com',
+	'www.pdlocal.com',
+	'pdlocal.net',
+	'www.pdlocal.net',
+])
 app.use((req, res, next) => {
 	if (req.method !== 'GET') return next()
 	const host = getHost(req)
-	if (host && !CANONICAL_HOSTS.has(host)) {
+	if (ALTERNATE_HOSTS.has(host)) {
 		res.redirect(301, `https://pdlocal.org${req.originalUrl}`)
 		return
 	}
