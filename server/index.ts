@@ -41,6 +41,20 @@ app.use((req, res, next) => {
 	next()
 })
 
+// pdlocal.com and pdlocal.net point here too (DNS-only, no Hover
+// forwarding), so any host other than the canonical org domain gets
+// permanently redirected here instead.
+const CANONICAL_HOSTS = new Set(['pdlocal.org', 'www.pdlocal.org'])
+app.use((req, res, next) => {
+	if (req.method !== 'GET') return next()
+	const host = getHost(req)
+	if (host && !CANONICAL_HOSTS.has(host)) {
+		res.redirect(301, `https://pdlocal.org${req.originalUrl}`)
+		return
+	}
+	next()
+})
+
 // no ending slashes for SEO reasons
 // https://github.com/epicweb-dev/epic-stack/discussions/108
 app.get(/.*/, (req, res, next) => {
